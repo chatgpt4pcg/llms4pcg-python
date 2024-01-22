@@ -51,10 +51,10 @@ def run_evaluation(team_name: str, fn: Type[TrialLoop], num_trials=10,
                     f"Trial {trial_number} for character {character} for team {team_name} already exists. Skipping.")
                 continue
 
-            run_trial(ctx, fn)
+            __run_trial(ctx, fn)
 
 
-def run_trial(ctx: TrialContext, fn: Type[TrialLoop]):
+def __run_trial(ctx: TrialContext, fn: Type[TrialLoop]):
     """
     Run a single trial.
     :param ctx: context containing trial information
