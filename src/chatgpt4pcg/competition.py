@@ -1,7 +1,7 @@
+from datetime import datetime
 from pathlib import Path
 from time import perf_counter
 from typing import Type
-from datetime import datetime
 
 from openai import OpenAI
 
@@ -75,18 +75,19 @@ def __run_trial(ctx: TrialContext, fn: Type[TrialLoop]):
         f.write(final_response)
 
 
-def chat_with_chatgpt(ctx: TrialContext, messages: []):
+def chat_with_chatgpt(ctx: TrialContext, messages: [], n=1) -> list[str]:
     """
     Chat with ChatGPT.
     :param ctx: context containing trial information
     :param messages: history of messages
+    :param n: number of responses to generate (default 1)
     :return: response
     """
-    model = "gpt-3.5-turbo-1106"
+    model = "gpt-3.5-turbo-1106"  # TODO: Upgrade to "gpt-3.5-turbo-0125"
     temperature = 1
     seed = 42
     max_time = 60
-    token_limit = 17000
+    token_limit = 17000  # TODO: Change to 22000
     log_file_path = ctx.get_log_file_path()
 
     current_time = perf_counter()
@@ -102,15 +103,16 @@ def chat_with_chatgpt(ctx: TrialContext, messages: []):
         messages=messages,
         model=model,
         temperature=temperature,
-        seed=seed
+        seed=seed,
+        n=n,
     )
 
-    response = chat_completion.choices[0].message.content
+    responses = [chat_completion.choices[i].message.content for i in range(n)]
     ctx.add_prompt_token_count(chat_completion.usage.prompt_tokens)
     ctx.add_output_token_count(chat_completion.usage.completion_tokens)
 
     log(log_file_path, f"Messages: {messages}")
-    log(log_file_path, f"Response: {response}")
+    log(log_file_path, f"Response: {responses}")
     log(log_file_path, f"Prompt token count: {chat_completion.usage.prompt_tokens}")
     log(log_file_path, f"Output token count: {chat_completion.usage.completion_tokens}")
     log(log_file_path, f"Total token count: {ctx.get_total_token_count()}")
@@ -119,4 +121,4 @@ def chat_with_chatgpt(ctx: TrialContext, messages: []):
         log(log_file_path, f"Prompt token limit exceeded. {ctx.get_total_token_count()} > {token_limit}")
         raise ValueError(f"Prompt token limit exceeded. {ctx.get_total_token_count()} > {token_limit}")
 
-    return response
+    return responses
