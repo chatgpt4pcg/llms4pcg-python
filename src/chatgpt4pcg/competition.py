@@ -86,8 +86,8 @@ def chat_with_chatgpt(ctx: TrialContext, messages: [], n=1) -> list[str]:
     model = "gpt-3.5-turbo-1106"  # TODO: Upgrade to "gpt-3.5-turbo-0125"
     temperature = 1
     seed = 42
-    max_time = 60
-    token_limit = 17000  # TODO: Change to 22000
+    max_time = 120
+    token_limit = 25000
     log_file_path = ctx.get_log_file_path()
 
     current_time = perf_counter()
