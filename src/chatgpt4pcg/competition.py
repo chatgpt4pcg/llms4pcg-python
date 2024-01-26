@@ -98,7 +98,7 @@ def chat_with_chatgpt(ctx: TrialContext, messages: [], n=1) -> list[str]:
         log(log_file_path, f"Time limit exceeded. {elapsed_time} > {max_time}")
         raise TimeoutError(f"Time limit exceeded. {elapsed_time} > {max_time}")
 
-    client = OpenAI()
+    client = OpenAI(timeout=60.0,)
     chat_completion = client.chat.completions.create(
         messages=messages,
         model=model,
