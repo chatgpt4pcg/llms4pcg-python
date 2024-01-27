@@ -29,7 +29,7 @@ skipping any that already exist.
 This function runs a single trial. It writes the result of the trial to the log file and the final response to a text
 file in the output directory.
 
-### `chat_with_chatgpt(ctx: TrialContext, messages: [])`
+### `chat_with_chatgpt(ctx: TrialContext, messages: []) -> list[str]`
 
 This function chats with ChatGPT. It sends a list of messages to the ChatGPT model and writes the response and token
 counts to the log file. It also checks for time and token limits, raising errors if these are exceeded.
@@ -40,21 +40,19 @@ To use this file, import it and call the `run_evaluation` function with the team
 arguments. You can also specify the number of trials to run and the characters to run trials for.
 
 ```python
-from competition import run_evaluation, TrialLoop, TrialContext, chat_with_chatgpt
+from chatgpt4pcg.competition import run_evaluation, TrialLoop, TrialContext, chat_with_chatgpt
 
 
 class ZeroShotPrompting(TrialLoop):
-    message_history = []
-
     @staticmethod
     def run(ctx: TrialContext, target_character: str) -> str:
-        ZeroShotPrompting.message_history.append({
+        message_history = [{
             "role": "user",
             "content": "Return this is a test message."
-        })
+        }]
 
-        response = chat_with_chatgpt(ctx, ZeroShotPrompting.message_history)
-        return response
+        response = chat_with_chatgpt(ctx, message_history)
+        return response[0]
 
 
 run_evaluation("x_wing", ZeroShotPrompting)
