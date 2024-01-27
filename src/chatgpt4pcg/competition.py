@@ -4,6 +4,8 @@ from time import perf_counter
 from typing import Type
 
 from openai import OpenAI
+from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam, \
+    ChatCompletionAssistantMessageParam
 
 from .models.trial_context import TrialContext
 from .models.trial_loop import TrialLoop
@@ -20,13 +22,21 @@ def run_evaluation(team_name: str, fn: Type[TrialLoop], num_trials=10,
     :param characters: characters to run trials for (default all characters)
     :return: None
     """
-
-    if characters is None:
-        characters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
+    all_characters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
                       "S", "T", "U", "V", "W", "X", "Y", "Z"]
+    if characters is None:
+        characters = all_characters
+
+    for character in characters:
+        if character not in all_characters:
+            raise ValueError(f"Character {character} is not in the alphabet.")
+
+    prohibited_team_name = ["logs"]
+    if team_name in prohibited_team_name:
+        raise ValueError(f"Team name {team_name} is prohibited.")
 
     team_path = Path(team_name)
-    logging_path = team_path / "logging"
+    logging_path = team_path.parent / "logs"
     output_path = team_path / "raw"
 
     Path.mkdir(team_path, exist_ok=True)
@@ -75,7 +85,9 @@ def __run_trial(ctx: TrialContext, fn: Type[TrialLoop]):
         f.write(final_response)
 
 
-def chat_with_chatgpt(ctx: TrialContext, messages: [], n=1) -> list[str]:
+def chat_with_chatgpt(ctx: TrialContext,
+                      messages: list[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam |
+                                     ChatCompletionAssistantMessageParam], n=1) -> list[str]:
     """
     Chat with ChatGPT.
     :param ctx: context containing trial information
@@ -98,7 +110,7 @@ def chat_with_chatgpt(ctx: TrialContext, messages: [], n=1) -> list[str]:
         log(log_file_path, f"Time limit exceeded. {elapsed_time} > {max_time}")
         raise TimeoutError(f"Time limit exceeded. {elapsed_time} > {max_time}")
 
-    client = OpenAI(timeout=60.0,)
+    client = OpenAI(timeout=60.0)
     chat_completion = client.chat.completions.create(
         messages=messages,
         model=model,
