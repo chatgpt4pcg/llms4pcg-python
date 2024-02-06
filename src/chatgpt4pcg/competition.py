@@ -80,7 +80,7 @@ def __run_trial(ctx: TrialContext, fn: Type[TrialLoop]):
         log(log_file_path, f"Trial {ctx.get_trial_number()} failed with error: {e}")
         return
 
-    with open(output_path / f"{ctx.get_trial_number()}.txt", "w") as f:
+    with open(output_path / f"{ctx.get_team_name()}_{ctx.get_character()}_{ctx.get_trial_number()}.txt", "w") as f:
         log(log_file_path, f"Trial {ctx.get_trial_number()} succeeded")
         f.write(final_response)
 
@@ -95,7 +95,7 @@ def chat_with_chatgpt(ctx: TrialContext,
     :param n: number of responses to generate (default 1)
     :return: response
     """
-    model = "gpt-3.5-turbo-1106"  # TODO: Upgrade to "gpt-3.5-turbo-0125"
+    model = "gpt-3.5-turbo-0125"
     temperature = 1
     seed = 42
     max_time = 120
