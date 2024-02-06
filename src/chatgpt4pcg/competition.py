@@ -52,7 +52,7 @@ def run_evaluation(team_name: str, fn: Type[TrialLoop], num_trials=10,
         character_path = output_path / character
         Path.mkdir(character_path, exist_ok=True)
 
-        for trial_number in range(num_trials):
+        for trial_number in range(1, num_trials + 1):
             log(log_file,
                 f"Running trial {trial_number} for character {character} for team {team_name}")
             ctx = TrialContext(team_name, character, trial_number, log_file)
