@@ -56,7 +56,7 @@ def run_evaluation(team_name: str, fn: Type[TrialLoop], num_trials=10,
             log(log_file,
                 f"Running trial {trial_number} for character {character} for team {team_name}")
             ctx = TrialContext(team_name, character, trial_number, log_file)
-            if (character_path / f"{trial_number}.txt").exists():
+            if (ctx.get_output_file_path()).exists():
                 log(log_file,
                     f"Trial {trial_number} for character {character} for team {team_name} already exists. Skipping.")
                 continue
@@ -71,7 +71,6 @@ def __run_trial(ctx: TrialContext, fn: Type[TrialLoop]):
     :param fn: trial loop function
     :return: None
     """
-    output_path = ctx.get_output_path()
     log_file_path = ctx.get_log_file_path()
 
     try:
@@ -80,7 +79,7 @@ def __run_trial(ctx: TrialContext, fn: Type[TrialLoop]):
         log(log_file_path, f"Trial {ctx.get_trial_number()} failed with error: {e}")
         return
 
-    with open(output_path / f"{ctx.get_team_name()}_{ctx.get_character()}_{ctx.get_trial_number()}.txt", "w") as f:
+    with open(ctx.get_output_file_path(), "w") as f:
         log(log_file_path, f"Trial {ctx.get_trial_number()} succeeded")
         f.write(final_response)
 

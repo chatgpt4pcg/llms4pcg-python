@@ -6,6 +6,7 @@ class TrialContext:
     """
     Trial context for a given trial.
     """
+
     def __init__(self, team_name, character, trial_number, log_file_path):
         self.__team_name = team_name
         self.__character = character
@@ -30,8 +31,11 @@ class TrialContext:
     def get_log_file_path(self):
         return self.__log_file_path
 
-    def get_output_path(self):
+    def get_output_folder_path(self):
         return Path(self.__team_name) / "raw" / Path(self.__character)
+
+    def get_output_file_path(self):
+        return self.get_output_folder_path() / f"{self.get_team_name()}_{self.get_character()}_{self.get_trial_number()}.txt"
 
     def add_prompt_token_count(self, count: int):
         self.__prompt_token_count += count
