@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from pathlib import Path
 from time import perf_counter
@@ -13,13 +14,15 @@ from .utils import log
 
 
 def run_evaluation(team_name: str, fn: Type[TrialLoop], num_trials=10,
-                   characters: list[str] = None):
+                   characters: list[str] = None, model_name=None, local_model_base_url=None):
     """
     Run a trial for each character in the alphabet for a given team.
     :param team_name: team name
     :param fn: trial loop function
     :param num_trials: number of trials to run (default 10)
     :param characters: characters to run trials for (default all characters)
+    :param model_name: model name (default None)
+    :param local_model_base_url: local model base URL (default None)
     :return: None
     """
     all_characters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
@@ -55,7 +58,7 @@ def run_evaluation(team_name: str, fn: Type[TrialLoop], num_trials=10,
         for trial_number in range(1, num_trials + 1):
             log(log_file,
                 f"Running trial {trial_number} for character {character} for team {team_name}")
-            ctx = TrialContext(team_name, character, trial_number, log_file)
+            ctx = TrialContext(team_name, character, trial_number, log_file, model_name, local_model_base_url)
             if (ctx.get_output_file_path()).exists():
                 log(log_file,
                     f"Trial {trial_number} for character {character} for team {team_name} already exists. Skipping.")
@@ -84,17 +87,16 @@ def __run_trial(ctx: TrialContext, fn: Type[TrialLoop]):
         f.write(final_response)
 
 
-def chat_with_chatgpt(ctx: TrialContext,
-                      messages: list[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam |
-                                     ChatCompletionAssistantMessageParam], n=1) -> list[str]:
+def chat_with_llm(ctx: TrialContext,
+                  messages: list[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam |
+                                 ChatCompletionAssistantMessageParam], n=1) -> list[str]:
     """
-    Chat with ChatGPT.
+    Chat with LLM.
     :param ctx: context containing trial information
     :param messages: history of messages
     :param n: number of responses to generate (default 1)
     :return: response
     """
-    model = "gpt-3.5-turbo-0125"
     temperature = 1
     seed = 42
     max_time = 120
@@ -109,10 +111,16 @@ def chat_with_chatgpt(ctx: TrialContext,
         log(log_file_path, f"Time limit exceeded. {elapsed_time} > {max_time}")
         raise TimeoutError(f"Time limit exceeded. {elapsed_time} > {max_time}")
 
-    client = OpenAI(timeout=60.0)
+    client = OpenAI(
+        api_key="not-used" if ctx.get_local_model_base_url() else os.getenv("OPENAI_API_KEY"),
+        timeout=60.0)
+
+    if ctx.get_local_model_base_url():
+        client.base_url = ctx.get_local_model_base_url()
+
     chat_completion = client.chat.completions.create(
         messages=messages,
-        model=model,
+        model=ctx.get_model_name() if ctx.get_model_name() else "gpt-3.5-turbo-0125",
         temperature=temperature,
         seed=seed,
         n=n,
