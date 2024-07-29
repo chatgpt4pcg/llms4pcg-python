@@ -1,6 +1,6 @@
 [project]
 name = "llm4pcg"
-version = "1.0.1"
+version = "1.0.2"
 description = "LLM4PCG is a python package containing required and utility functions of ChatGPT4PCG competition, but modified to support local LLMs that compatible with OpenAI API interface."
 readme = "README.md"
 requires-python = ">=3.11"
