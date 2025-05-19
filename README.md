@@ -1,14 +1,13 @@
-# LLM4PCG
+# LLMs4PCG
 
-LLM4PCG is a python package containing required and utility functions of ChatGPT4PCG competition, but modified to
-support local LLMs that compatible with OpenAI API interface.
+LLMs4PCG is a python package containing required and utility functions as a part of LLMs4PCG competition.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install LLM4PCG.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install LLMs4PCG.
 
 ```bash
-pip install llm4pcg
+pip install llms4pcg
 ```
 
 ## Dependency
@@ -45,7 +44,7 @@ To use this file, import it and call the `run_evaluation` function with the team
 arguments. You can also specify the number of trials to run and the characters to run trials for.
 
 ```python
-from llm4pcg.competition import run_evaluation, TrialLoop, TrialContext, chat_with_llm
+from llms4pcg.competition import run_evaluation, TrialLoop, TrialContext, chat_with_llm
 
 
 class ZeroShotPrompting(TrialLoop):

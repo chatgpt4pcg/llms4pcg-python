@@ -98,7 +98,7 @@ def chat_with_llm(ctx: TrialContext,
     :return: response
     """
     temperature = 1
-    seed = 42
+    # seed = 0 + ctx.get_trial_number()
     max_time = 120
     token_limit = 25000
     log_file_path = ctx.get_log_file_path()
@@ -122,7 +122,7 @@ def chat_with_llm(ctx: TrialContext,
         messages=messages,
         model=ctx.get_model_name() if ctx.get_model_name() else "gpt-3.5-turbo-0125",
         temperature=temperature,
-        seed=seed,
+        # seed=seed,
         n=n,
     )
 
