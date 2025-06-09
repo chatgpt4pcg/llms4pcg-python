@@ -99,7 +99,7 @@ def chat_with_llm(ctx: TrialContext,
     """
     temperature = 1
     # seed = 0 + ctx.get_trial_number()
-    max_time = 120
+    max_time = 500
     token_limit = 25000
     log_file_path = ctx.get_log_file_path()
 
@@ -112,8 +112,7 @@ def chat_with_llm(ctx: TrialContext,
         raise TimeoutError(f"Time limit exceeded. {elapsed_time} > {max_time}")
 
     client = OpenAI(
-        api_key="not-used" if ctx.get_local_model_base_url() else os.getenv("OPENAI_API_KEY"),
-        timeout=60.0)
+        api_key="not-used" if ctx.get_local_model_base_url() else os.getenv("OPENAI_API_KEY"))
 
     if ctx.get_local_model_base_url():
         client.base_url = ctx.get_local_model_base_url()
